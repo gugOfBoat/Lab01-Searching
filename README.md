@@ -28,12 +28,6 @@ The input file contains:
 - **Subsequent lines**: Adjacency matrix of the graph.
 - **Last line**: Heuristic values for each node (for heuristic-based algorithms).
 
-### 🔹 Example Input:
-5 0 4 0 1 1 0 0 1 0 0 1 1 1 0 0 1 0 0 1 1 0 1 0 1 0 1 0 1 2 2 3 1
-
-markdown
-Copy
-Edit
 
 ## 📤 Output Format
 - **Path found** from start to goal.
@@ -41,38 +35,3 @@ Edit
 
 ### 🔹 Example Output:
 BFS: Path: 0 -> 1 -> 3 -> 4 Time: 0.0000003 seconds Memory: 8 KB
-
-bash
-Copy
-Edit
-
-## 🚀 How to Run
-### **1. Clone the Repository**
-```bash
-git clone https://github.com/gugOfBoat/Lab01-Searching.git
-cd Lab01-Searching
-2. Install Dependencies
-bash
-Copy
-Edit
-pip install -r requirements.txt
-3. Run the Program
-bash
-Copy
-Edit
-python main.py input.txt output.txt
-Replace input.txt with your actual input file.
-
-📝 Evaluation Criteria
-✅ Correct implementation of BFS, DFS, UCS, IDS, GBFS, A*, and Hill Climbing.
-✅ Performance analysis: runtime and memory usage.
-✅ At least 5 test cases with different attributes.
-✅ Well-documented report (PDF).
-✅ Code organization and proper submission format.
-📖 References
-Artificial Intelligence: A Modern Approach - Stuart Russell & Peter Norvig
-University lecture slides and materials
-📌 Notes:
-This is an individual assignment.
-Plagiarism will result in a 0 grade.
-Ensure that the report is well-formatted and exported as PDF.
