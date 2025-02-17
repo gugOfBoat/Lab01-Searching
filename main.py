@@ -212,7 +212,7 @@ def dls(arr, source, destination, depth_limit):
         
         if depth < depth_limit:
             for neighbor in reversed(range(len(arr[current]))):
-                if arr[current][neighbor] != 0 and neighbor not in visited:
+                if arr[current][neighbor] > 0 and neighbor not in visited:
                     # For tracing
                     visited[neighbor] = current
                     frontier.append((neighbor, depth + 1))
@@ -278,6 +278,31 @@ def gbfs(arr, source, destination, heuristic):
 
     path = []
     visited = {}
+    priorityQueue = []
+
+    heapq.heappush(priorityQueue, (heuristic[source], source, None))
+
+    while priorityQueue:
+        _, current, parent = heapq.heappop(priorityQueue)
+
+        if current in visited:
+            continue
+
+        visited[current] = parent
+
+        if current == destination: # The goal reached
+            break
+
+        for neighbor in range(len(arr[current])):
+            if arr[current][neighbor] > 0 and neighbor not in visited:
+                heapq.heappush(priorityQueue, (heuristic[neighbor], neighbor, current))
+        
+    if destination in visited:
+        node = destination
+        while node is not None:
+            path.append(node)
+            node = visited[node]
+        path.reverse()
 
     return visited, path
 
@@ -360,6 +385,29 @@ def readInputFile(filename):
 
     return numOfNodes, start, goal, adjacencyMatrix, heuristic
 
+# Function to measure time and memory for each search algorithm
+def measure_memory(func, *args):
+    tracemalloc.start()  # Start measuring memory
+    start_time = time.perf_counter()  # Start measuring time
+    visited, path = func(*args)  # Run the algorithm
+    end_time = time.perf_counter()  # Stop measuring time
+    current, peak = tracemalloc.get_traced_memory()  # Get memory usage
+    tracemalloc.stop()  # Stop measuring memory
+
+    return {
+        "path": path,
+        "time": end_time - start_time,
+        "memory": peak / 1024  # Convert bytes to KB
+    }
+
+# Function to format results
+def format_results(name, results):
+    return (
+        f"{name}:\n"
+        f"Path: {' -> '.join(map(str, results['path'])) if results['path'] else '-1'}\n"
+        f"Time: {results['time']:.7f} seconds\n"
+        f"Memory: {results['memory']:.2f} KB\n\n"
+    )
 
 
 # 2. Main function
@@ -386,100 +434,28 @@ if __name__ == "__main__":
     
     # TODO: Call a function to execute the path finding process
 
-    bfs_path = []
-    bfs_visited, bfs_path = bfs(adjacencyMatrix, start, goal) # Call the bfs 
-
-    dfs_path = []
-    dfs_visited, dfs_path = dfs(adjacencyMatrix, start, goal) # Call the dfs
-
-    ucs_path = []
-    ucs_visited, ucs_path = ucs(adjacencyMatrix, start, goal) # Call the ucs
-
-    dls_path = []
-    dls_visited, dls_path = dls(adjacencyMatrix, start, goal, 10) # Call the dls
-
-    ids_path = []
-    ids_visited, ids_path = ids(adjacencyMatrix, start, goal)
+    bfs_results = measure_memory(bfs, adjacencyMatrix, start, goal)
+    dfs_results = measure_memory(dfs, adjacencyMatrix, start, goal)
+    ucs_results = measure_memory(ucs, adjacencyMatrix, start, goal)
+    dls_results = measure_memory(dls, adjacencyMatrix, start, goal, 10)
+    ids_results = measure_memory(ids, adjacencyMatrix, start, goal)
+    gbfs_results = measure_memory(gbfs, adjacencyMatrix, start, goal, heuristic)
     # TODO: Stop measuring 
 
-    end_time = time.time()      # Save the end time
-
-    current, peak = tracemalloc.get_traced_memory()      # Get memory data
-
-    tracemalloc.stop()       # Stop supervise memory
+    end_time = time.perf_counter()
+    current, peak = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
 
     # TODO: Show the output data
     output_file = "output.txt"
-
     with open(output_file, "w") as file:
-        #BFS
-        file.write("BFS:\n")
-
-        # the Path
-        if bfs_path:
-            file.write("Path: " + " -> ".join(map(str, bfs_path)) + "\n")
-        else:
-            file.write("Path: -1\n")
-
-        file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
-
-        file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory use
-
-        #DFS
-        file.write("DFS:\n")
-
-        # the Path
-        if dfs_path:
-            file.write("Path: " + " -> ".join(map(str, dfs_path)) + "\n")
-        else:
-            file.write("Path: -1\n")
-
-        file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
-
-        file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
-
-        #UCS
-        file.write("UCS:\n")
-
-        # the Path
-        if ucs_path:
-            file.write("Path: " + " -> ".join(map(str, ucs_path)) + "\n")
-        else:
-            file.write("Path: -1\n")
-
-        file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
-
-        file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
-
-        #DLS
-        file.write("UCS:\n")
-
-        # the Path
-        if dls_path:
-            file.write("Path: " + " -> ".join(map(str, dls_path)) + "\n")
-        else:
-            file.write("Path: -1\n")
-
-        file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
-
-        file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
-
-        #IDS
-        file.write("IDS:\n")
-
-        # the Path
-        if ids_path:
-            file.write("Path: " + " -> ".join(map(str, ids_path)) + "\n")
-        else:
-            file.write("Path: -1\n")
-
-        file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
-
-        file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
-
-
-
-
+        file.write(format_results("BFS", bfs_results))
+        file.write(format_results("DFS", dfs_results))
+        file.write(format_results("UCS", ucs_results))
+        file.write(format_results("DLS", dls_results))
+        file.write(format_results("IDS", ids_results))
+        file.write(format_results("GBFS", gbfs_results))
+        
     print("✅ Output saved to", output_file)
 
     pass
