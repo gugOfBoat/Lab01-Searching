@@ -200,37 +200,56 @@ def dls(arr, source, destination, depth_limit):
     path = []
     visited = {}
 
+    #Init
+    frontier = [(source, 0)]
+    visited[source] = None
+
+    while frontier:
+        current, depth = frontier.pop()
+
+        if current == destination:
+            break
+        
+        if depth < depth_limit:
+            for neighbor in reversed(range(len(arr[current]))):
+                if arr[current][neighbor] != 0 and neighbor not in visited:
+                    # For tracing
+                    visited[neighbor] = current
+                    frontier.append((neighbor, depth + 1))
+
+    # Make full path if goal expanded
+    if destination in visited:
+        node = destination
+        while node is not None:
+            path.append(node)
+            node = visited[node]
+        path.reverse()
     return visited, path
 
 
 # 1.4.b. IDS
 def ids(arr, source, destination):
     """
-    IDS algorithm:
+    Iterative Deepening Search (IDS) - Depth-first search with increasing depth limits.
+
     Parameters:
     ---------------------------
-    arr: list / numpy array 
-        The graph's adjacency matrix
-    source: integer
-        Starting node
-    destination: integer
-        Ending node
-    
-    Returns
+    arr: list (2D array) - Adjacency matrix representing the graph
+    source: int - Starting node
+    destination: int - Goal node
+
+    Returns:
     ---------------------
-    visited: dictionary
-        The dictionary contains visited nodes, each key is a visited node,
-        each value is the adjacent node visited before it.
-    path: list
-        Founded path
+    visited: dict - Dictionary storing visited nodes `{node: parent}`
+    path: list - Shortest path from `source` to `destination`
     """
-    # TODO
+    for depth_limit in range(len(arr)):  # Increase depth limit from 0 to N
+        visited, path = dls(arr, source, destination, depth_limit)  # Call DLS
 
-    path = []
-    visited = {}
+        if path:  # If DLS found a valid path, return the result
+            return visited, path
 
-    return visited, path
-
+    return {}, []  # If no path is found after trying all depths
 
 # 1.5. Greedy best first search (GBFS)
 def gbfs(arr, source, destination, heuristic):
@@ -376,6 +395,11 @@ if __name__ == "__main__":
     ucs_path = []
     ucs_visited, ucs_path = ucs(adjacencyMatrix, start, goal) # Call the ucs
 
+    dls_path = []
+    dls_visited, dls_path = dls(adjacencyMatrix, start, goal, 10) # Call the dls
+
+    ids_path = []
+    ids_visited, ids_path = ids(adjacencyMatrix, start, goal)
     # TODO: Stop measuring 
 
     end_time = time.time()      # Save the end time
@@ -418,7 +442,7 @@ if __name__ == "__main__":
         file.write("UCS:\n")
 
         # the Path
-        if dfs_path:
+        if ucs_path:
             file.write("Path: " + " -> ".join(map(str, ucs_path)) + "\n")
         else:
             file.write("Path: -1\n")
@@ -426,6 +450,33 @@ if __name__ == "__main__":
         file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
 
         file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
+
+        #DLS
+        file.write("UCS:\n")
+
+        # the Path
+        if dls_path:
+            file.write("Path: " + " -> ".join(map(str, dls_path)) + "\n")
+        else:
+            file.write("Path: -1\n")
+
+        file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
+
+        file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
+
+        #IDS
+        file.write("IDS:\n")
+
+        # the Path
+        if ids_path:
+            file.write("Path: " + " -> ".join(map(str, ids_path)) + "\n")
+        else:
+            file.write("Path: -1\n")
+
+        file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
+
+        file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
+
 
 
 
