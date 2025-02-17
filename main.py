@@ -1,5 +1,6 @@
 # TODO: Import libraries
 import time
+import heapq
 import tracemalloc
 from collections import deque
 
@@ -139,6 +140,33 @@ def ucs(arr, source, destination):
 
     path = []
     visited = {}
+    priorityQueue = []
+
+    heapq.heappush(priorityQueue, (0, source, None))
+
+    while priorityQueue:
+        cost, current, parent = heapq.heappop(priorityQueue)
+
+        if current in visited: # Find optimal path before
+            continue
+        
+        visited[current] = (parent, cost)
+
+        if current == destination: # Reach the goal
+            break
+        
+        for neighbor in range(len(arr[current])):
+            if arr[current][neighbor] > 0 and neighbor not in visited:
+                newCost = cost + arr[current][neighbor] # Update path cost
+                heapq.heappush(priorityQueue, (newCost, neighbor, current))
+
+    # For tracing
+    if destination in visited:
+        node = destination
+        while node is not None:
+            path.append(node)
+            node = visited[node][0] # Continue tracing
+        path.reverse()
 
     return visited, path
 
@@ -345,6 +373,9 @@ if __name__ == "__main__":
     dfs_path = []
     dfs_visited, dfs_path = dfs(adjacencyMatrix, start, goal) # Call the dfs
 
+    ucs_path = []
+    ucs_visited, ucs_path = ucs(adjacencyMatrix, start, goal) # Call the ucs
+
     # TODO: Stop measuring 
 
     end_time = time.time()      # Save the end time
@@ -382,6 +413,20 @@ if __name__ == "__main__":
         file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
 
         file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
+
+        #UCS
+        file.write("UCS:\n")
+
+        # the Path
+        if dfs_path:
+            file.write("Path: " + " -> ".join(map(str, ucs_path)) + "\n")
+        else:
+            file.write("Path: -1\n")
+
+        file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
+
+        file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
+
 
 
     print("✅ Output saved to", output_file)
