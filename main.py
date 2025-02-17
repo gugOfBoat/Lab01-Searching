@@ -86,6 +86,31 @@ def dfs(arr, source, destination):
     path = []
     visited = {}
 
+    #Init
+    frontier = [source]
+    visited[source] = None
+
+    while frontier:
+        current = frontier.pop()
+
+        if current == destination:
+            break
+        
+        for neighbor in reversed(range(len(arr[current]))):
+            if arr[current][neighbor] != 0 and neighbor not in visited:
+                # For tracing
+                visited[neighbor] = current
+                frontier.append(neighbor)
+
+    # Make full path if goal expanded
+    if destination in visited:
+        node = destination
+        while node is not None:
+            path.append(node)
+            node = visited[node]
+        path.reverse()
+        
+
     return visited, path
 
 
@@ -314,9 +339,11 @@ if __name__ == "__main__":
     
     # TODO: Call a function to execute the path finding process
 
-    path = []  # Init mt path
+    bfs_path = []
+    bfs_visited, bfs_path = bfs(adjacencyMatrix, start, goal) # Call the bfs 
 
-    visited, path = bfs(adjacencyMatrix, start, goal) # Call the bfs 
+    dfs_path = []
+    dfs_visited, dfs_path = dfs(adjacencyMatrix, start, goal) # Call the dfs
 
     # TODO: Stop measuring 
 
@@ -330,17 +357,32 @@ if __name__ == "__main__":
     output_file = "output.txt"
 
     with open(output_file, "w") as file:
+        #BFS
         file.write("BFS:\n")
 
         # the Path
-        if path:
-            file.write("Path: " + " -> ".join(map(str, path)) + "\n")
+        if bfs_path:
+            file.write("Path: " + " -> ".join(map(str, bfs_path)) + "\n")
+        else:
+            file.write("Path: -1\n")
+
+        file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
+
+        file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory use
+
+        #DFS
+        file.write("DFS:\n")
+
+        # the Path
+        if dfs_path:
+            file.write("Path: " + " -> ".join(map(str, dfs_path)) + "\n")
         else:
             file.write("Path: -1\n")
 
         file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
 
         file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
+
 
     print("✅ Output saved to", output_file)
 
