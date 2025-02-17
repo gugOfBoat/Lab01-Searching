@@ -1,0 +1,4 @@
+BFS:
+Path: -1
+Time: 0.0000000 seconds
+Memory: 1.06 KB

@@ -1,4 +1,7 @@
 # TODO: Import libraries
+import time
+import tracemalloc
+from collections import deque
 
 # 1. Search Strategies Implementation
 # 1.1. Breadth-first search (BFS)
@@ -26,6 +29,33 @@ def bfs(arr, source, destination):
 
     path = []
     visited = {}
+
+    #Init
+    frontier = deque([source])
+    visited[source] = None
+
+    while frontier:
+        current = frontier.popleft()
+
+
+        if current == destination:
+            break
+        
+        for neighbor, is_connected in enumerate(arr[current]):
+            #If not have path and not visited
+            if is_connected and neighbor not in visited: 
+                # For tracing
+                visited[neighbor] = current
+                
+                frontier.append(neighbor)
+
+    # Make full path if goal expanded
+    if destination in visited:
+        node = destination
+        while node is not None:
+            path.append(node)
+            node = visited[node]
+        path.reverse()
 
     return visited, path
 
@@ -241,17 +271,77 @@ def hc(arr, source, destination, heuristic):
 
     return visited, path
 
+def readInputFile(filename):
+    with open(filename, 'r') as file:
+        lines = file.readlines()
+
+    numOfNodes = int(lines[0].strip())     # Read number of node in first line
+
+    start, goal = map(int, lines[1].strip().split())     # Read start and goal
+
+    adjacencyMatrix = []     # Read matrix
+    for i in range(2, 2 + numOfNodes):
+        row = list(map(int, lines[i].strip().split()))
+        adjacencyMatrix.append(row)
+
+    heuristic = list(map(int, lines[-1].strip().split())) if len(lines) > 2 + numOfNodes else None     # Read Heuristic(if any)
+
+    return numOfNodes, start, goal, adjacencyMatrix, heuristic
+
+
 
 # 2. Main function
 if __name__ == "__main__":
     # TODO: Read the input data
+    inputFile = "input.txt"
+    numOfNodes, start, goal, adjacencyMatrix, heuristic = readInputFile(inputFile)
+
+    # Print test
+    print("Number of nodes:", numOfNodes)
+    print("Start node:", start)
+    print("Goal node:", goal)
+    print("Adjacency Matrix:")
+
+    for row in adjacencyMatrix:
+        print(row)
+    if heuristic:
+        print("Heuristic values:", heuristic)
 
     # TODO: Start measuring
 
+    tracemalloc.start()       # start supervise memory
+    start_time = time.time()  # start supervise time complexity
+    
     # TODO: Call a function to execute the path finding process
+
+    path = []  # Init mt path
+
+    visited, path = bfs(adjacencyMatrix, start, goal) # Call the bfs 
 
     # TODO: Stop measuring 
 
+    end_time = time.time()      # Save the end time
+
+    current, peak = tracemalloc.get_traced_memory()      # Get memory data
+
+    tracemalloc.stop()       # Stop supervise memory
+
     # TODO: Show the output data
+    output_file = "output.txt"
+
+    with open(output_file, "w") as file:
+        file.write("BFS:\n")
+
+        # the Path
+        if path:
+            file.write("Path: " + " -> ".join(map(str, path)) + "\n")
+        else:
+            file.write("Path: -1\n")
+
+        file.write(f"Time: {end_time - start_time:.7f} seconds\n")         # Excute time
+
+        file.write(f"Memory: {peak / 1024:.2f} KB\n")         # Memory used
+
+    print("✅ Output saved to", output_file)
 
     pass
