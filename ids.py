@@ -1,6 +1,6 @@
 from dls import dls
 # 1.4.b. IDS
-def ids(arr, source, destination):
+def ids(arr, source, destination, max_depth = None):
     """
     Iterative Deepening Search (IDS) - Depth-first search with increasing depth limits.
 
