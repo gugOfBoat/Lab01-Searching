@@ -29,22 +29,21 @@ def hc(arr, source, destination, heuristic):
     current = source
 
     while current != destination:
-        # Get the list of neighbors that haven't been visited yet
-        neighbors = [i for i in range(len(arr[current])) if arr[current][i] > 0 and i not in visited]
+        # Get the list of neighbors
+        neighbors = [i for i in range(len(arr[current])) if arr[current][i] > 0]
 
         if not neighbors:
             break  # No more neighbors to visit, stop
 
-        # Filter neighbors with a better (lower) heuristic value than the current node
-        better_neighbors = [n for n in neighbors if heuristic[n] < heuristic[current]]
+        random.shuffle(neighbors)  # Shuffle neighbors randomly to mimic First-Choice behavior
 
-        if not better_neighbors:
+        for next_node in neighbors:
+            if heuristic[next_node] < heuristic[current]:  # Select the first better neighbor found
+                visited[next_node] = current  # Save the parent node for path tracing
+                current = next_node  # Move to the next node
+                break
+        else:
             break  # No better neighbor found, stop
-
-        # Randomly choose one of the better neighbors
-        next_node = random.choice(better_neighbors)
-        visited[next_node] = current  # Save the parent node for path tracing
-        current = next_node  # Move to the next node
 
     # Trace back the path if the destination was reached
     if current == destination:
