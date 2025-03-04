@@ -27,12 +27,12 @@ def gbfs(arr, source, destination, heuristic):
 
     path = []
     visited = {}
-    priorityQueue = []
+    frontier = [] # A priority queue
 
-    heapq.heappush(priorityQueue, (heuristic[source], source, None))
+    heapq.heappush(frontier, (heuristic[source], source, None))
 
-    while priorityQueue:
-        _, current, parent = heapq.heappop(priorityQueue)
+    while frontier:
+        _, current, parent = heapq.heappop(frontier)
 
         if current in visited:
             continue
@@ -44,7 +44,7 @@ def gbfs(arr, source, destination, heuristic):
 
         for neighbor in range(len(arr[current])):
             if arr[current][neighbor] > 0 and neighbor not in visited:
-                heapq.heappush(priorityQueue, (heuristic[neighbor], neighbor, current))
+                heapq.heappush(frontier, (heuristic[neighbor], neighbor, current))
     
     # for tracing
     if destination in visited:
